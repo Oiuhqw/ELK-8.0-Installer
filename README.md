@@ -8,4 +8,4 @@ wget -qO- https://raw.githubusercontent.com/Oiuhqw/ELK-8.0-Installer/main/instal
 
 Password would be printed out on console at the end of the script.
 
-Navigate to <host ipaddress> to access elasticsearch panel.
+Navigate to "host ipaddress" to access elasticsearch panel.
