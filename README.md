@@ -38,12 +38,3 @@ Elasticsearch built-in superuser password: <your-password>
 The password has also been saved to /home/<your-user>/elastic-password
 ```
 Replace <your-host-ip-address> with the actual IP address of your host to access the Elasticsearch panel.
-
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-## Contributing
-If you find any issues or have suggestions for improvements, feel free to open an issue or submit a pull request.
-
-## Disclaimer
-This script is provided as-is without any warranty. Use at your own risk.
