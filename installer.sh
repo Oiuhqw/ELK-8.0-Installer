@@ -6,6 +6,9 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
+# Get the original user's home directory
+USER_HOME=$(eval echo ~$SUDO_USER)
+
 # Install curl
 sudo apt update
 sudo apt install -y curl
@@ -26,6 +29,10 @@ PASSWORD=$(grep -oP '(?<=The generated password for the elastic built-in superus
 
 # Clean up the temporary file
 rm -f $TEMP_FILE
+
+# Write the password to a file in the original user's home directory
+echo $PASSWORD > "$USER_HOME/elastic-password"
+chown $SUDO_USER:$SUDO_USER "$USER_HOME/elastic-password"
 
 # Start and enable Elasticsearch service
 sudo systemctl start elasticsearch
@@ -63,3 +70,4 @@ sudo systemctl enable nginx
 
 # Output the Elasticsearch password
 echo "Elasticsearch built-in superuser password: $PASSWORD"
+echo "The password has also been saved to $USER_HOME/elastic-password"
