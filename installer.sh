@@ -24,7 +24,7 @@ TEMP_FILE=$(mktemp)
 sudo apt install -y elasticsearch | tee $TEMP_FILE
 
 # Extract the generated password from the temporary file
-PASSWORD=$(grep -oP '(?<=The generated password for the elastic built-in superuser is : ).*' $TEMP_FILE)
+PASSWORD=$(grep -oP '(?<=The generated password for the elastic built-in superuser is : ).*' $TEMP_FILE | tr -d '\r\n')
 
 # Clean up the temporary file
 rm -f $TEMP_FILE
