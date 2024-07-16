@@ -143,3 +143,5 @@ echo "Elasticsearch built-in superuser password: $PASSWORD"
 echo "The password has also been saved to $USER_HOME/elastic-password"
 echo "Fleet service token: $SERVICE_TOKEN"
 echo "The Fleet service token has also been saved to $USER_HOME/fleet-service-token"
+echo
+echo "Navigate to https://$IP to access the Elasticsearch Interface"
