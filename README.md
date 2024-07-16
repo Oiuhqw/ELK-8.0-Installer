@@ -64,7 +64,7 @@ Navigate to `<your-host-ip-address>` to access the Elasticsearch panel.
 wget -qO- https://raw.githubusercontent.com/Oiuhqw/ELK-8.0-Installer/main/installer.sh | sudo bash
 ```
 
-After the script completes, you should see a message similar to:
+After the script completes, you should see a message similar to, it will also include the command to be used on the client system:
 
 ```
 Navigate to http://<your-host-ip-address> to access the Elasticsearch Interface
