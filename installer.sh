@@ -185,7 +185,7 @@ start_unattended_upgrades
 
 # Output the Elasticsearch password and Fleet service token
 #echo "Elasticsearch built-in superuser password: $PASSWORD"
-echo "The password has also been saved to $USER_HOME/elastic-password"
+echo "The Password has also been saved to $USER_HOME/elastic-password"
 #echo "Fleet service token: $SERVICE_TOKEN"
 echo "The Fleet service token has also been saved to $USER_HOME/fleet-service-token"
 echo
@@ -194,3 +194,6 @@ echo "Navigate to http://$IP to access the Elasticsearch Interface"
 echo "Login to the interface with the following credentials: "
 echo "Username: elastic"
 echo "Password: $PASSWORD"
+echo 
+echo "Please execute the following command on a client host to enroll it with the Fleet server"
+echo "wget https://raw.githubusercontent.com/Oiuhqw/ELK-8.0-Installer/main/client.sh -qO client.sh; sudo bash client.sh"
