@@ -145,7 +145,8 @@ echo $SERVICE_TOKEN > "$USER_HOME/elk-configs/fleet-service-token"
 chown $SUDO_USER:$SUDO_USER "$USER_HOME/elk-configs/fleet-service-token"
 
 # Create Fleet Server policy using the provided curl command
-curl --location 'http://localhost/api/fleet/agent_policies?sys_monitoring=true' \
+#curl --location 'http://localhost/api/fleet/agent_policies?sys_monitoring=true' \
+curl --location 'http://localhost/api/fleet/agent_policies' \
     --header 'Accept: */*' \
     --header 'Content-Type: application/json' \
     --header 'Cache-Control: no-cache' \
