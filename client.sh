@@ -5,16 +5,24 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
+# Function to read input with sudo
+sudo_read() {
+  local prompt="$1"
+  local var_name="$2"
+  local input
+  read -p "$prompt" input
+  eval $var_name=\$input
+}
 
 # Request for user input in bash script for password and save to PASSWORD variable
-read -p "Please enter your elasticsearch password: " PASSWORD
+sudo_read "Please enter your elasticsearch password: " PASSWORD
 
 # Encode the elastic user credentials
 AUTHORIZATION=$(echo -n "elastic:$PASSWORD" | base64)
 echo -n "elastic:$PASSWORD"
 echo "$AUTHORIZATION"
 
-read -p "Please enter your elasticsearch server IP: " IP
+sudo_read "Please enter your elasticsearch server IP: " IP
 
 
 # Function to wait for the dpkg lock
