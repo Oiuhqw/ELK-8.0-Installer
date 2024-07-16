@@ -30,6 +30,7 @@ stop_unattended_upgrades
 
 # Get the original user's home directory
 USER_HOME=$(eval echo ~$SUDO_USER)
+mkdir $USER_HOME/elk-configs
 
 # Install necessary packages
 wait_for_dpkg_lock
@@ -57,8 +58,8 @@ PASSWORD=$(grep -oP '(?<=The generated password for the elastic built-in superus
 rm -f $TEMP_FILE
 
 # Write the password to a file in the original user's home directory
-echo $PASSWORD > "$USER_HOME/elastic-password"
-chown $SUDO_USER:$SUDO_USER "$USER_HOME/elastic-password"
+echo $PASSWORD > "$USER_HOME/elk-configs/elastic-password"
+chown $SUDO_USER:$SUDO_USER "$USER_HOME/elk-configs/elastic-password"
 
 # Start and enable Elasticsearch service
 sudo systemctl start elasticsearch
@@ -106,7 +107,6 @@ fi
 sudo systemctl restart nginx
 sudo systemctl enable nginx
 
-
 echo "wait for kibana service to start"
 sleep 100
 
@@ -141,8 +141,8 @@ SERVICE_TOKEN=$(curl --location --request POST 'http://localhost/api/fleet/servi
 sleep 10
 
 # Write the Fleet service token to a file in the original user's home directory
-echo $SERVICE_TOKEN > "$USER_HOME/fleet-service-token"
-chown $SUDO_USER:$SUDO_USER "$USER_HOME/fleet-service-token"
+echo $SERVICE_TOKEN > "$USER_HOME/elk-configs/fleet-service-token"
+chown $SUDO_USER:$SUDO_USER "$USER_HOME/elk-configs/fleet-service-token"
 
 # Create Fleet Server policy using the provided curl command
 curl --location 'http://localhost/api/fleet/agent_policies?sys_monitoring=true' \
@@ -156,8 +156,11 @@ curl --location 'http://localhost/api/fleet/agent_policies?sys_monitoring=true' 
 
 sleep 30
 
-# Check if the certificate file exists and is readable
-CERT_PATH="/etc/elasticsearch/certs/http_ca.crt"
+# Define the configuration file path
+KIBANA_CONFIG_FILE="/etc/kibana/kibana.yml"
+
+# Extract the file path from the uncommented line using grep and sed
+CERT_PATH=$(grep -oP '^\s*elasticsearch.ssl.certificateAuthorities: \[\K[^\]]+' "$KIBANA_CONFIG_FILE")
 
 # Get the fingerprint of the certificate and remove colons
 FINGERPRINT=$(sudo openssl x509 -noout -fingerprint -sha256 -in "$CERT_PATH" | awk -F'=' '{print $2}' | tr -d ':' | tr '[:upper:]' '[:lower:]')
@@ -165,9 +168,9 @@ FINGERPRINT=$(sudo openssl x509 -noout -fingerprint -sha256 -in "$CERT_PATH" | a
 
 # Download and install Elastic Agent
 cd /tmp
-curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-8.14.2-linux-x86_64.tar.gz
-tar xzvf elastic-agent-8.14.2-linux-x86_64.tar.gz
-cd elastic-agent-8.14.2-linux-x86_64
+curl -L -O https://artifacts.elastic.co/downloads/beats/elastic-agent/elastic-agent-8.14.3-linux-x86_64.tar.gz
+tar xzvf elastic-agent-8.14.3-linux-x86_64.tar.gz
+cd elastic-agent-8.14.3-linux-x86_64
 
 # Install and configure Fleet server
 sudo yes | sudo ./elastic-agent install \
@@ -187,4 +190,6 @@ echo "The Fleet service token has also been saved to $USER_HOME/fleet-service-to
 echo
 echo " ===== Installation Completed ===== "
 echo "Navigate to http://$IP to access the Elasticsearch Interface"
-echo "Login to the interface with the following credentials  elastic:$PASSWORD "
+echo "Login to the interface with the following credentials: "
+echo "Username: elastic"
+echo "Password: $PASSWORD"
