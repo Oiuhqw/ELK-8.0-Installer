@@ -170,10 +170,11 @@ sudo yes | sudo ./elastic-agent install \
 start_unattended_upgrades
 
 # Output the Elasticsearch password and Fleet service token
-echo "Elasticsearch built-in superuser password: $PASSWORD"
+#echo "Elasticsearch built-in superuser password: $PASSWORD"
 echo "The password has also been saved to $USER_HOME/elastic-password"
-echo "Fleet service token: $SERVICE_TOKEN"
+#echo "Fleet service token: $SERVICE_TOKEN"
 echo "The Fleet service token has also been saved to $USER_HOME/fleet-service-token"
 echo
 echo " ===== Installation Completed ===== "
 echo "Navigate to http://$IP to access the Elasticsearch Interface"
+echo "Login to the interface with the following credentials  elastic:$PASSWORD "
