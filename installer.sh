@@ -10,6 +10,7 @@ USER_HOME=$(eval echo ~$SUDO_USER)
 
 # Install necessary packages
 sudo apt update
+sleep 20
 sudo apt install -y curl jq
 
 # Add Elasticsearch GPG key and repository
@@ -18,6 +19,8 @@ echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.
 
 # Update package list and install Elasticsearch
 sudo apt update
+
+sleep 20
 
 # Temporary file to capture the Elasticsearch installation output
 TEMP_FILE=$(mktemp)
