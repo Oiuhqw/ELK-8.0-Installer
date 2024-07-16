@@ -74,6 +74,16 @@ KIBANA_TOKEN=$(sudo /usr/share/elasticsearch/bin/elasticsearch-create-enrollment
 # Setup Kibana with the enrollment token
 echo $KIBANA_TOKEN | sudo /usr/share/kibana/bin/kibana-setup
 
+# Generate the encryption keys and capture the output
+OUTPUT=$(sudo /usr/share/kibana/bin/kibana-encryption-keys generate)
+
+# Extract the last three lines containing the keys
+ENCRYPTION_KEYS=$(echo "$OUTPUT" | tail -n 3)
+
+# Append the keys to the Kibana configuration file
+echo "$ENCRYPTION_KEYS" | sudo tee -a /etc/kibana/kibana.yml
+
+
 # Start and enable Kibana service
 sudo systemctl start kibana
 sudo systemctl enable kibana
