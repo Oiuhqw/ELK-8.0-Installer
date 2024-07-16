@@ -5,12 +5,36 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
+# Function to wait for the dpkg lock
+wait_for_dpkg_lock() {
+    while sudo fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 || sudo fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do
+        echo "Waiting for other package manager to finish..."
+        sleep 10
+    done
+}
+
+# Stop unattended-upgrades service to prevent automatic updates
+stop_unattended_upgrades() {
+    sudo systemctl stop unattended-upgrades
+    sudo systemctl disable unattended-upgrades
+}
+
+# Start unattended-upgrades service after script completion
+start_unattended_upgrades() {
+    sudo systemctl enable unattended-upgrades
+    sudo systemctl start unattended-upgrades
+}
+
+# Stop unattended-upgrades at the beginning of the script
+stop_unattended_upgrades
+
 # Get the original user's home directory
 USER_HOME=$(eval echo ~$SUDO_USER)
 
 # Install necessary packages
+wait_for_dpkg_lock
 sudo apt update
-sleep 20
+wait_for_dpkg_lock
 sudo apt install -y curl jq
 
 # Add Elasticsearch GPG key and repository
@@ -18,9 +42,9 @@ curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo gpg --dearm
 echo "deb [signed-by=/usr/share/keyrings/elastic.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
 
 # Update package list and install Elasticsearch
+wait_for_dpkg_lock
 sudo apt update
-
-sleep 20
+wait_for_dpkg_lock
 
 # Temporary file to capture the Elasticsearch installation output
 TEMP_FILE=$(mktemp)
@@ -41,6 +65,7 @@ sudo systemctl start elasticsearch
 sudo systemctl enable elasticsearch
 
 # Install Kibana
+wait_for_dpkg_lock
 sudo apt install -y kibana
 
 # Generate Kibana enrollment token
@@ -54,6 +79,7 @@ sudo systemctl start kibana
 sudo systemctl enable kibana
 
 # Install Nginx
+wait_for_dpkg_lock
 sudo apt install -y nginx
 
 # Update Nginx configuration
@@ -141,10 +167,13 @@ sudo yes | sudo ./elastic-agent install \
   --fleet-server-es-ca-trusted-fingerprint=$FINGERPRINT \
   --fleet-server-port=8220
 
+start_unattended_upgrades
+
 # Output the Elasticsearch password and Fleet service token
 echo "Elasticsearch built-in superuser password: $PASSWORD"
 echo "The password has also been saved to $USER_HOME/elastic-password"
 echo "Fleet service token: $SERVICE_TOKEN"
 echo "The Fleet service token has also been saved to $USER_HOME/fleet-service-token"
 echo
-echo "Navigate to https://$IP to access the Elasticsearch Interface"
+echo " ===== Installation Completed ===== "
+echo "Navigate to http://$IP to access the Elasticsearch Interface"
