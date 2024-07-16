@@ -5,24 +5,16 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
-# Function to read input with sudo
-sudo_read() {
-  local prompt="$1"
-  local var_name="$2"
-  local input
-  read -p "$prompt" input
-  eval $var_name=\$input
-}
-
 # Request for user input in bash script for password and save to PASSWORD variable
-sudo_read "Please enter your elasticsearch password: " PASSWORD
+read -p "Please enter your elasticsearch password: " PASSWORD
 
 # Encode the elastic user credentials
 AUTHORIZATION=$(echo -n "elastic:$PASSWORD" | base64)
 echo -n "elastic:$PASSWORD"
+echo
 echo "$AUTHORIZATION"
 
-sudo_read "Please enter your elasticsearch server IP: " IP
+read -p "Please enter your elasticsearch server IP: " IP
 
 
 # Function to wait for the dpkg lock
@@ -50,7 +42,7 @@ stop_unattended_upgrades
 wait_for_dpkg_lock
 sudo apt update
 wait_for_dpkg_lock
-sudo apt install -y curl auditd
+sudo apt install -y curl auditd jq
 
 # Create Client policy using the provided curl command
 curl --location 'http://'$IP'/api/fleet/agent_policies?sys_monitoring=true' \
@@ -78,7 +70,7 @@ cd elastic-agent-8.14.3-linux-x86_64
 sudo yes | sudo ./elastic-agent install --url=https://$IP:8220 --enrollment-token=$ENROLLMENT_TOKEN --insecure
 
 # Define the target file path
-AUDIT_RULES_FILE="/etc/audit/audit.rules"
+AUDIT_RULES_FILE="/etc/audit/rules.d/audit.rules"
 
 # Overwrite the audit.rules file with the desired content
 cat << EOF | sudo tee $AUDIT_RULES_FILE > /dev/null
